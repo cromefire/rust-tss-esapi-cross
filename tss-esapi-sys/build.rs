@@ -405,6 +405,7 @@ pub mod tpm2_tss {
                 config.env("AR", format!("{}-ar", host_triplet));
                 config.env("RANLIB", format!("{}-ranlib", host_triplet));
 
+                config.env("ac_cv_func_strndup", "yes");
                 config.env("CFLAGS", "-D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L");
             }
 
