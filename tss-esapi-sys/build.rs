@@ -393,6 +393,12 @@ pub mod tpm2_tss {
             }
 
             let mut config = autotools::Config::new(p);
+
+            let target = std::env::var("TARGET").unwrap_or_default();
+            if target == "x86_64-pc-windows-gnu" {
+                config.config_option("host", Some("x86_64-w64-mingw32"));
+            }
+
             config
                 // Force configuration of the autotools env
                 .reconf("-fiv")
