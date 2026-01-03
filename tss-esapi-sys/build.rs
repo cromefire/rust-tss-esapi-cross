@@ -399,14 +399,6 @@ pub mod tpm2_tss {
                 let host_triplet = "x86_64-w64-mingw32";
         
                 config.config_option("host", Some(host_triplet));
-
-                config.env("CC", format!("{}-gcc", host_triplet));
-                config.env("CXX", format!("{}-g++", host_triplet));
-                config.env("AR", format!("{}-ar", host_triplet));
-                config.env("RANLIB", format!("{}-ranlib", host_triplet));
-
-                config.env("ac_cv_func_strndup", "yes");
-                config.env("CFLAGS", "-D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L");
             }
 
             config
