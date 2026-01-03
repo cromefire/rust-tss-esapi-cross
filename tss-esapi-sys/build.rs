@@ -393,8 +393,17 @@ pub mod tpm2_tss {
             }
 
             let mut config = autotools::Config::new(p);
+            
+            let vars = ["CC", "CXX", "AR", "RANLIB", "CFLAGS", "HOST"];
+            for var in vars {
+                println!("cargo:rerun-if-env-changed={}", var);
+                if let Ok(content) = std::env::var(var) {
+                    config.env(var, content);
+                }
+            }
 
             let target = std::env::var("TARGET").unwrap_or_default();
+            println!("cargo:rerun-if-env-changed=TARGET");
             if target == "x86_64-pc-windows-gnu" {
                 let host_triplet = "x86_64-w64-mingw32";
         
