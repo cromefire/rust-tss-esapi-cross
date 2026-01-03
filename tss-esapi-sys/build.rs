@@ -394,7 +394,7 @@ pub mod tpm2_tss {
 
             let mut config = autotools::Config::new(p);
             
-            let vars = ["CC", "CXX", "AR", "RANLIB", "CFLAGS", "HOST"];
+            let vars = ["CC", "CXX", "AR", "RANLIB", "HOST"];
             for var in vars {
                 println!("cargo:rerun-if-env-changed={}", var);
                 if let Ok(content) = std::env::var(var) {
@@ -408,6 +408,22 @@ pub mod tpm2_tss {
                 let host_triplet = "x86_64-w64-mingw32";
         
                 config.config_option("host", Some(host_triplet));
+                let polyfill = "-D\"strndup(s, n)=({ \
+                    const char *__s = (s); \
+                    size_t __n = (n); \
+                    size_t __len = strnlen(__s, __n); \
+                    char *__res = (char *)malloc(__len + 1); \
+                    if (__res) { \
+                        memcpy(__res, __s, __len); \
+                        __res[__len] = '\\0'; \
+                    } \
+                    __res; \
+                })\"";
+                let mut cflags = std::env::var("CFLAGS").unwrap_or_default();
+                println!("cargo:rerun-if-env-changed=CFLAGS");
+                cflags.push_str(&format!(" {} -D_GNU_SOURCE", polyfill));
+                config.env("CFLAGS", cflags);
+                config.env("ac_cv_func_strndup", "yes");
             }
 
             config
