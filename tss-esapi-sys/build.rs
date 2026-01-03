@@ -396,7 +396,16 @@ pub mod tpm2_tss {
 
             let target = std::env::var("TARGET").unwrap_or_default();
             if target == "x86_64-pc-windows-gnu" {
-                config.config_option("host", Some("x86_64-w64-mingw32"));
+                let host_triplet = "x86_64-w64-mingw32";
+        
+                config.config_option("host", Some(host_triplet));
+
+                config.env("CC", format!("{}-gcc", host_triplet));
+                config.env("CXX", format!("{}-g++", host_triplet));
+                config.env("AR", format!("{}-ar", host_triplet));
+                config.env("RANLIB", format!("{}-ranlib", host_triplet));
+
+                config.env("CFLAGS", "-D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L");
             }
 
             config
